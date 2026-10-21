@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { 
   CLUB_STATS, 
   CLUB_PILLARS, 
@@ -12,6 +12,7 @@ import {
 import { ROUTES_DATA } from '../data/routesData';
 import { FAQS_DATA } from '../data/faqsData';
 import { 
+  supabase,
   saveSolicitudToSupabase, 
   syncCmsToSupabase, 
   fetchCmsFromSupabase 
@@ -126,28 +127,106 @@ export function CmsProvider({ children }) {
     return DEFAULT_CMS_DATA;
   });
 
+  const [syncStatus, setSyncStatus] = useState('idle'); // 'idle' | 'saving' | 'synced' | 'error'
+  const isInitialMount = useRef(true);
+  const syncTimeoutRef = useRef(null);
+
+  // Guardar en localStorage inmediatamente en cada cambio
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(cmsData));
     } catch {
       // Storage fallback
     }
+
+    // Auto-sincronización con Supabase (con debounce para no saturar la red)
+    if (isInitialMount.current) {
+      return;
+    }
+
+    setSyncStatus('saving');
+    if (syncTimeoutRef.current) {
+      clearTimeout(syncTimeoutRef.current);
+    }
+
+    syncTimeoutRef.current = setTimeout(async () => {
+      try {
+        const res = await syncCmsToSupabase(cmsData);
+        if (res?.error) {
+          console.warn('Error en auto-sync Supabase:', res.error);
+          setSyncStatus('error');
+        } else {
+          setSyncStatus('synced');
+          // Volver a estado normal tras 3 segundos
+          setTimeout(() => setSyncStatus('idle'), 3000);
+        }
+      } catch (err) {
+        console.warn('Excepción en auto-sync:', err);
+        setSyncStatus('error');
+      }
+    }, 600);
+
+    return () => {
+      if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+    };
   }, [cmsData]);
 
-  // Carga inicial en segundo plano desde Supabase (si existe registro remoto)
+  // Carga inicial desde Supabase y sincronización bidireccional
   useEffect(() => {
     let isMounted = true;
-    fetchCmsFromSupabase().then((remoteContent) => {
-      if (isMounted && remoteContent && typeof remoteContent === 'object') {
-        setCmsData((prev) => ({
-          ...prev,
-          ...remoteContent
-        }));
+
+    async function initCloudSync() {
+      try {
+        const remoteContent = await fetchCmsFromSupabase();
+        if (!isMounted) return;
+
+        if (remoteContent && remoteContent.hero && remoteContent.clubInfo) {
+          // Si la nube ya tiene datos reales del club, adoptarlos como verdad absoluta
+          setCmsData((prev) => ({
+            ...prev,
+            ...remoteContent
+          }));
+        } else {
+          // Si la nube está vacía o sin inicializar, subir los datos locales actuales para sembrar la base de datos
+          syncCmsToSupabase(cmsData);
+        }
+      } catch (err) {
+        console.info('Supabase init notice:', err);
+      } finally {
+        if (isMounted) {
+          isInitialMount.current = false;
+        }
       }
-    }).catch((err) => {
-      console.info('Supabase cloud fetch note:', err);
-    });
-    return () => { isMounted = false; };
+    }
+
+    initCloudSync();
+
+    // Suscripción en tiempo real: Si otro dispositivo (ej. PC) actualiza el CMS, el móvil lo recibe al instante
+    let channel = null;
+    if (supabase) {
+      channel = supabase
+        .channel('realtime_cms_content')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'cms_content', filter: 'id=eq.1' },
+          (payload) => {
+            if (payload.new && payload.new.content && payload.new.content.hero) {
+              setCmsData((prev) => ({
+                ...prev,
+                ...payload.new.content
+              }));
+            }
+          }
+        )
+        .subscribe();
+    }
+
+    return () => {
+      isMounted = false;
+      if (channel && supabase) {
+        supabase.removeChannel(channel);
+      }
+    };
   }, []);
 
   // Section updaters
@@ -393,6 +472,7 @@ export function CmsProvider({ children }) {
         updateContactRequestStatus,
         deleteContactRequest,
         updateContactSettings,
+        syncStatus,
         syncWithCloud,
         loadFromCloud,
         resetToDefaults

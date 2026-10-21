@@ -16,7 +16,12 @@ import {
   Flame,
   Clock,
   History as HistoryIcon,
-  Inbox
+  Inbox,
+  Cloud,
+  CloudUpload,
+  RefreshCw,
+  Check,
+  AlertTriangle
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCms } from '../../context/CmsContext';
@@ -56,10 +61,24 @@ const TAB_TITLES = {
 
 export default function AdminDashboard({ onExitAdmin, onNotify }) {
   const { logout } = useAuth();
-  const { cmsData } = useCms();
+  const { cmsData, syncStatus, syncWithCloud } = useCms();
 
   const [activeTab, setActiveTab] = useState('identidad');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleForceSync = async () => {
+    if (onNotify) onNotify('Guardando cambios en Supabase...');
+    try {
+      const res = await syncWithCloud();
+      if (res?.error) {
+        if (onNotify) onNotify(`Error al sincronizar: ${res.error.message || 'Verifica la conexión'}`);
+      } else {
+        if (onNotify) onNotify('¡Cambios guardados en la nube con éxito!');
+      }
+    } catch (err) {
+      if (onNotify) onNotify('Error al conectar con Supabase');
+    }
+  };
 
   const nuevasCount = (cmsData.contactRequests || []).filter((r) => r.status === 'nueva').length;
 
@@ -322,6 +341,53 @@ export default function AdminDashboard({ onExitAdmin, onNotify }) {
           </div>
 
           <div className="admin-topbar-actions">
+            {/* Indicador en vivo de estado Supabase */}
+            <div 
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                padding: '0.35rem 0.75rem',
+                borderRadius: '999px',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                background: syncStatus === 'saving' 
+                  ? 'rgba(234, 179, 8, 0.15)' 
+                  : syncStatus === 'synced'
+                  ? 'rgba(34, 197, 94, 0.15)'
+                  : syncStatus === 'error'
+                  ? 'rgba(239, 68, 68, 0.15)'
+                  : 'rgba(255, 255, 255, 0.05)',
+                color: syncStatus === 'saving'
+                  ? '#facc15'
+                  : syncStatus === 'synced'
+                  ? '#4ade80'
+                  : syncStatus === 'error'
+                  ? '#f87171'
+                  : 'var(--text-muted)',
+                border: '1px solid rgba(255, 255, 255, 0.08)'
+              }}
+            >
+              {syncStatus === 'saving' && <RefreshCw size={13} style={{ animation: 'spin 1s linear infinite' }} />}
+              {syncStatus === 'synced' && <Check size={13} style={{ color: '#4ade80' }} />}
+              {syncStatus === 'error' && <AlertTriangle size={13} style={{ color: '#f87171' }} />}
+              {syncStatus === 'idle' && <Cloud size={13} />}
+              <span>
+                {syncStatus === 'saving' ? 'Guardando...' : syncStatus === 'synced' ? 'Nube OK' : syncStatus === 'error' ? 'Error Nube' : 'Supabase Conectado'}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={handleForceSync}
+              title="Guardar todos los cambios en Supabase ahora"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', padding: '0.4rem 0.75rem' }}
+            >
+              <CloudUpload size={14} />
+              <span className="hide-on-mobile">Guardar Nube</span>
+            </button>
+
             <button 
               type="button" 
               className="admin-btn-view-site"

@@ -114,8 +114,12 @@ export async function fetchCmsFromSupabase() {
       .eq('id', 1)
       .maybeSingle();
 
-    if (error || !data) return null;
-    return data.content;
+    if (error || !data || !data.content) return null;
+    // Validar que sea un contenido válido de CMS y no un objeto vacío o de prueba
+    if (typeof data.content === 'object' && data.content.hero && data.content.clubInfo) {
+      return data.content;
+    }
+    return null;
   } catch (err) {
     console.error('Error cargando CMS desde Supabase:', err);
     return null;
