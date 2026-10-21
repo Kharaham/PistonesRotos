@@ -11,6 +11,11 @@ import {
 } from '../data/clubData';
 import { ROUTES_DATA } from '../data/routesData';
 import { FAQS_DATA } from '../data/faqsData';
+import { 
+  saveSolicitudToSupabase, 
+  syncCmsToSupabase, 
+  fetchCmsFromSupabase 
+} from '../lib/supabase';
 
 const CmsContext = createContext();
 
@@ -128,6 +133,22 @@ export function CmsProvider({ children }) {
       // Storage fallback
     }
   }, [cmsData]);
+
+  // Carga inicial en segundo plano desde Supabase (si existe registro remoto)
+  useEffect(() => {
+    let isMounted = true;
+    fetchCmsFromSupabase().then((remoteContent) => {
+      if (isMounted && remoteContent && typeof remoteContent === 'object') {
+        setCmsData((prev) => ({
+          ...prev,
+          ...remoteContent
+        }));
+      }
+    }).catch((err) => {
+      console.info('Supabase cloud fetch note:', err);
+    });
+    return () => { isMounted = false; };
+  }, []);
 
   // Section updaters
   const updateSection = (sectionKey, updatedFields) => {
@@ -277,6 +298,12 @@ export function CmsProvider({ children }) {
       ...prev,
       contactRequests: [newRequest, ...(prev.contactRequests || [])]
     }));
+
+    // Guardar en la tabla 'solicitudes' de Supabase
+    saveSolicitudToSupabase(newRequest).catch((err) => {
+      console.info('Aviso Supabase solicitudes:', err);
+    });
+
     return newRequest;
   };
 
@@ -316,6 +343,22 @@ export function CmsProvider({ children }) {
     });
   };
 
+  const syncWithCloud = async () => {
+    return await syncCmsToSupabase(cmsData);
+  };
+
+  const loadFromCloud = async () => {
+    const cloudContent = await fetchCmsFromSupabase();
+    if (cloudContent && typeof cloudContent === 'object') {
+      setCmsData((prev) => ({
+        ...prev,
+        ...cloudContent
+      }));
+      return true;
+    }
+    return false;
+  };
+
   const resetToDefaults = () => {
     setCmsData(DEFAULT_CMS_DATA);
     localStorage.removeItem(STORAGE_KEY);
@@ -350,6 +393,8 @@ export function CmsProvider({ children }) {
         updateContactRequestStatus,
         deleteContactRequest,
         updateContactSettings,
+        syncWithCloud,
+        loadFromCloud,
         resetToDefaults
       }}
     >

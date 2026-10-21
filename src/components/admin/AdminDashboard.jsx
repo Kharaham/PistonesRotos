@@ -21,6 +21,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { useCms } from '../../context/CmsContext';
 import ConfirmModal from '../ui/ConfirmModal';
+import { uploadImageToSupabase } from '../../lib/supabase';
 
 // Modular Section Tabs
 import IdentidadTab from './tabs/IdentidadTab';
@@ -73,16 +74,33 @@ export default function AdminDashboard({ onExitAdmin, onNotify }) {
     action: null
   });
 
-  const handleImageUpload = (e, callback) => {
+  const handleImageUpload = async (e, callback) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        callback(reader.result);
-        if (onNotify) onNotify('Foto cargada');
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    if (onNotify) onNotify('Subiendo imagen a la nube (Supabase)...');
+
+    try {
+      const { url, error } = await uploadImageToSupabase(file, activeTab);
+      if (url && !error) {
+        callback(url);
+        if (onNotify) onNotify('¡Imagen guardada en Supabase Storage con éxito!');
+        return;
+      }
+      if (error) {
+        console.warn('Aviso Supabase Storage:', error);
+      }
+    } catch (err) {
+      console.warn('Error al subir a Supabase:', err);
     }
+
+    // Fallback local en caso de que el bucket aún no esté creado
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      callback(reader.result);
+      if (onNotify) onNotify('Imagen cargada localmente (crea el bucket en Supabase para almacenamiento en nube)');
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
