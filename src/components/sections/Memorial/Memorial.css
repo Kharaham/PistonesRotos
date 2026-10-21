@@ -1,0 +1,613 @@
+/* ==========================================================================
+   MEMORIAL SECTION STYLES - ASFALTO ETERNO
+   ========================================================================== */
+
+.memorial-section {
+  position: relative;
+  background: 
+    radial-gradient(circle at 50% 20%, rgba(217, 119, 6, 0.04) 0%, transparent 60%),
+    linear-gradient(180deg, #08080a 0%, #0c0a08 50%, #08080a 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.8s ease-in-out;
+}
+
+/* When one or more candles are lit, warm candlelight illuminates the section */
+.memorial-section.memorial-section-lit {
+  background: 
+    radial-gradient(circle at 50% 30%, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.06) 45%, transparent 75%),
+    linear-gradient(180deg, #08080a 0%, #15110d 50%, #08080a 100%);
+}
+
+.memorial-halo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: #fbbf24;
+  margin-bottom: 0.8rem;
+  transition: all 0.4s ease;
+}
+
+.memorial-halo-badge.active {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: #f59e0b;
+  color: #fef3c7;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
+  transform: scale(1.02);
+}
+
+/* ==========================================================================
+   MEMORIAL HEADER ILLUMINATION
+   ========================================================================== */
+
+.memorial-header {
+  position: relative;
+  transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 1.25rem 1rem 1.5rem 1rem;
+  border-radius: var(--radius-lg);
+  max-width: 720px;
+  margin: 0 auto 2.25rem auto;
+}
+
+.memorial-section.memorial-section-lit .memorial-header {
+  background: radial-gradient(ellipse at 50% 50%, rgba(245, 158, 11, 0.24) 0%, rgba(217, 119, 6, 0.08) 55%, transparent 75%);
+  animation: headerCandleAura 3s ease-in-out infinite alternate;
+}
+
+@keyframes headerCandleAura {
+  0% {
+    background: radial-gradient(ellipse at 50% 50%, rgba(245, 158, 11, 0.18) 0%, rgba(217, 119, 6, 0.06) 55%, transparent 75%);
+  }
+  50% {
+    background: radial-gradient(ellipse at 50% 50%, rgba(245, 158, 11, 0.3) 0%, rgba(217, 119, 6, 0.11) 60%, transparent 80%);
+  }
+  100% {
+    background: radial-gradient(ellipse at 50% 50%, rgba(245, 158, 11, 0.22) 0%, rgba(217, 119, 6, 0.07) 55%, transparent 75%);
+  }
+}
+
+.memorial-title {
+  transition: all 0.6s ease;
+}
+
+.memorial-section.memorial-section-lit .memorial-title {
+  background: linear-gradient(135deg, #ffffff 0%, #fef3c7 25%, #fbbf24 60%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 25px rgba(245, 158, 11, 0.7)) drop-shadow(0 0 50px rgba(217, 119, 6, 0.35));
+  animation: titleCandlePulse 2.8s ease-in-out infinite alternate;
+}
+
+@keyframes titleCandlePulse {
+  0% {
+    filter: drop-shadow(0 0 18px rgba(245, 158, 11, 0.55)) drop-shadow(0 0 40px rgba(217, 119, 6, 0.25));
+  }
+  100% {
+    filter: drop-shadow(0 0 32px rgba(251, 191, 36, 0.95)) drop-shadow(0 0 60px rgba(245, 158, 11, 0.45));
+  }
+}
+
+.memorial-desc {
+  transition: all 0.6s ease;
+}
+
+.memorial-section.memorial-section-lit .memorial-desc {
+  color: #fef3c7;
+  text-shadow: 0 0 14px rgba(245, 158, 11, 0.25);
+}
+
+.memorial-header-glow-line {
+  width: 0;
+  height: 2px;
+  margin: 1.2rem auto 0 auto;
+  background: linear-gradient(90deg, transparent, #fbbf24, #f59e0b, transparent);
+  box-shadow: 0 0 15px #f59e0b;
+  border-radius: 999px;
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+  opacity: 0;
+}
+
+.memorial-section.memorial-section-lit .memorial-header-glow-line {
+  width: 160px;
+  opacity: 1;
+}
+
+.memorial-badge {
+  background: rgba(217, 119, 6, 0.1);
+  border: 1px solid rgba(217, 119, 6, 0.35);
+  color: #fbbf24;
+}
+
+.memorial-badge-flame {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f59e0b;
+  box-shadow: 0 0 10px #f59e0b;
+}
+
+.memorial-carousel-container {
+  position: relative;
+  width: 100%;
+}
+
+.memorial-grid {
+  display: grid;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  animation: memorialFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes memorialFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.memorial-card {
+  background: rgba(18, 16, 14, 0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(217, 119, 6, 0.2);
+  border-radius: var(--radius-md);
+  padding: 2.4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.memorial-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.4), transparent);
+  transition: background 0.5s ease;
+}
+
+.memorial-card:hover {
+  border-color: rgba(217, 119, 6, 0.45);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9), 0 0 25px rgba(245, 158, 11, 0.08);
+}
+
+/* ==========================================================================
+   LIT CANDLE ANIMATION & WARM HALO
+   ========================================================================== */
+.memorial-card.memorial-card-lit {
+  background: rgba(26, 20, 14, 0.88);
+  border-color: rgba(245, 158, 11, 0.7);
+  box-shadow: 
+    0 0 38px -4px rgba(245, 158, 11, 0.35),
+    0 22px 50px rgba(0, 0, 0, 0.95),
+    inset 0 0 35px rgba(245, 158, 11, 0.08);
+  transform: translateY(-4px);
+  animation: cardCandleGlow 2.8s ease-in-out infinite alternate;
+}
+
+.memorial-card.memorial-card-lit::before {
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #fbbf24, transparent);
+  box-shadow: 0 0 15px #f59e0b;
+}
+
+@keyframes cardCandleGlow {
+  0% {
+    box-shadow: 
+      0 0 30px -4px rgba(245, 158, 11, 0.28),
+      0 20px 45px rgba(0, 0, 0, 0.9),
+      inset 0 0 25px rgba(245, 158, 11, 0.06);
+    border-color: rgba(245, 158, 11, 0.55);
+  }
+  50% {
+    box-shadow: 
+      0 0 46px -2px rgba(245, 158, 11, 0.45),
+      0 24px 55px rgba(0, 0, 0, 0.95),
+      inset 0 0 38px rgba(245, 158, 11, 0.12);
+    border-color: rgba(251, 191, 36, 0.9);
+  }
+  100% {
+    box-shadow: 
+      0 0 32px -4px rgba(245, 158, 11, 0.3),
+      0 20px 45px rgba(0, 0, 0, 0.9),
+      inset 0 0 26px rgba(245, 158, 11, 0.07);
+    border-color: rgba(245, 158, 11, 0.6);
+  }
+}
+
+/* Floating Candle Sparks */
+.card-sparks-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  z-index: 1;
+}
+
+.candle-spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #fbbf24;
+  box-shadow: 0 0 8px #f59e0b, 0 0 14px #fbbf24;
+  opacity: 0;
+  animation: sparkRise 3.2s cubic-bezier(0.2, 0.8, 0.3, 1) infinite;
+}
+
+.spark-1 { left: 45%; bottom: 80px; animation-delay: 0.1s; }
+.spark-2 { left: 54%; bottom: 95px; animation-delay: 0.9s; width: 3px; height: 3px; }
+.spark-3 { left: 48%; bottom: 70px; animation-delay: 1.8s; width: 5px; height: 5px; }
+.spark-4 { left: 42%; bottom: 110px; animation-delay: 2.5s; width: 3px; height: 3px; }
+
+@keyframes sparkRise {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.3);
+  }
+  20% {
+    opacity: 0.95;
+    transform: translateY(-30px) translateX(6px) scale(1.1);
+  }
+  65% {
+    opacity: 0.7;
+    transform: translateY(-90px) translateX(-7px) scale(0.85);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-145px) translateX(10px) scale(0.2);
+  }
+}
+
+/* Flame Badge at corner */
+.candle-flame-wrapper {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.18);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fbbf24;
+  letter-spacing: 0.05em;
+  font-family: var(--font-mono);
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.4);
+  animation: flameBadgeAppear 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 2;
+}
+
+@keyframes flameBadgeAppear {
+  0% { opacity: 0; transform: scale(0.6) translateY(-8px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Portrait with warm candlelight aura */
+.memorial-portrait-container {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  padding: 4px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%);
+  margin-bottom: 1.4rem;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.8);
+  position: relative;
+  transition: all 0.5s ease;
+}
+
+.memorial-card-lit .memorial-portrait-container {
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #d97706 100%);
+  box-shadow: 
+    0 0 35px rgba(245, 158, 11, 0.7),
+    0 0 15px rgba(251, 191, 36, 0.9);
+  animation: portraitFlamePulse 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes portraitFlamePulse {
+  0% {
+    box-shadow: 0 0 25px rgba(245, 158, 11, 0.5), 0 0 10px rgba(251, 191, 36, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 42px rgba(245, 158, 11, 0.85), 0 0 20px rgba(251, 191, 36, 1);
+  }
+}
+
+.portrait-candle-glow {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px dashed rgba(251, 191, 36, 0.4);
+  pointer-events: none;
+  animation: rotateAura 18s linear infinite;
+}
+
+@keyframes rotateAura {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.memorial-portrait {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  filter: grayscale(100%) contrast(1.15);
+  transition: filter 0.6s ease;
+}
+
+.memorial-card:hover .memorial-portrait {
+  filter: grayscale(80%) contrast(1.1);
+}
+
+.memorial-card-lit .memorial-portrait {
+  filter: grayscale(35%) sepia(25%) contrast(1.15) brightness(1.08);
+}
+
+.memorial-years {
+  font-size: 0.82rem;
+  letter-spacing: 0.15em;
+  color: #fbbf24;
+  margin-bottom: 0.4rem;
+}
+
+.memorial-name {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 0.3rem;
+  transition: color 0.4s ease;
+}
+
+.memorial-card-lit .memorial-name {
+  text-shadow: 0 0 12px rgba(251, 191, 36, 0.45);
+}
+
+.memorial-moto {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1.2rem;
+}
+
+.memorial-words {
+  font-size: 0.92rem;
+  font-style: italic;
+  color: #d1d5db;
+  line-height: 1.6;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1.2rem 0;
+  margin-bottom: 1.4rem;
+  transition: all 0.4s ease;
+}
+
+.memorial-card-lit .memorial-words {
+  border-color: rgba(245, 158, 11, 0.25);
+  color: #f3f4f6;
+}
+
+/* Flame flicker animation */
+.flame-flicker {
+  animation: flameDance 1.3s ease-in-out infinite alternate;
+  transform-origin: bottom center;
+  color: #fbbf24;
+  filter: drop-shadow(0 0 6px #f59e0b);
+}
+
+@keyframes flameDance {
+  0% {
+    transform: scale(1) rotate(-3deg);
+    filter: drop-shadow(0 0 5px #f59e0b);
+  }
+  25% {
+    transform: scale(1.12, 0.92) rotate(4deg);
+    filter: drop-shadow(0 0 9px #fbbf24);
+  }
+  50% {
+    transform: scale(0.92, 1.08) rotate(-4deg);
+    filter: drop-shadow(0 0 6px #f59e0b);
+  }
+  75% {
+    transform: scale(1.08, 0.96) rotate(3deg);
+    filter: drop-shadow(0 0 11px #fbbf24);
+  }
+  100% {
+    transform: scale(1) rotate(-1deg);
+    filter: drop-shadow(0 0 7px #f59e0b);
+  }
+}
+
+.memorial-tribute-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.15rem;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-weight: 600;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: #fbbf24;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+  z-index: 2;
+}
+
+.memorial-tribute-btn:hover {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: #f59e0b;
+  transform: scale(1.04);
+}
+
+.memorial-tribute-btn.lit {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #08080a;
+  border-color: #fbbf24;
+  font-weight: 700;
+  box-shadow: 
+    0 0 20px rgba(245, 158, 11, 0.6), 
+    0 0 35px rgba(245, 158, 11, 0.35);
+  transform: scale(1.02);
+}
+
+.memorial-tribute-btn.lit:hover {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  box-shadow: 
+    0 0 28px rgba(245, 158, 11, 0.8), 
+    0 0 45px rgba(245, 158, 11, 0.45);
+  transform: scale(1.06);
+}
+
+/* ==========================================================================
+   CAROUSEL CONTROLS
+   ========================================================================== */
+.memorial-carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  margin-top: 2.8rem;
+  width: 100%;
+}
+
+.memorial-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.memorial-nav-btn:hover {
+  background: rgba(245, 158, 11, 0.22);
+  border-color: #f59e0b;
+  color: #ffffff;
+  transform: scale(1.08);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+}
+
+.memorial-pagination-pills {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.memorial-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.25s ease;
+}
+
+.memorial-dot:hover {
+  background: rgba(245, 158, 11, 0.5);
+}
+
+.memorial-dot.active {
+  width: 28px;
+  background: #f59e0b;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .memorial-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)) !important;
+    gap: 1.6rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .memorial-section .container {
+    padding: 0 1.25rem !important;
+  }
+
+  .memorial-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x mandatory !important;
+    scroll-padding-left: 1.25rem !important;
+    scroll-padding-inline-start: 1.25rem !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-behavior: smooth !important;
+    gap: 1.25rem !important;
+    padding: 0.75rem 1.25rem 1.5rem 1.25rem !important;
+    margin: 0 -1.25rem !important;
+    width: calc(100% + 2.5rem) !important;
+    max-width: none !important;
+    animation: none !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  .memorial-grid::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  .memorial-card {
+    flex: 0 0 84vw !important;
+    width: 84vw !important;
+    max-width: 320px !important;
+    min-width: 270px !important;
+    scroll-snap-align: start !important;
+    scroll-snap-stop: normal !important;
+    box-sizing: border-box !important;
+    padding: 2.2rem 1.4rem 1.8rem !important;
+  }
+
+  .memorial-words {
+    min-height: auto !important;
+  }
+
+  .memorial-carousel-controls {
+    display: none !important;
+  }
+
+  .memorial-pagination-pills {
+    margin-top: 1.25rem !important;
+    justify-content: center !important;
+    gap: 0.45rem !important;
+  }
+}

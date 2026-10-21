@@ -1,0 +1,21 @@
+/* ==========================================================================
+   APP SHELL / LAYOUT WRAPPER
+   All component-specific CSS has been decomposed into modular section stylesheets:
+   - src/components/layout/Navbar/Navbar.css
+   - src/components/layout/Footer/Footer.css
+   - src/components/sections/Hero/Hero.css
+   - src/components/sections/Manifest/Manifest.css
+   - src/components/sections/Convoy/Convoy.css
+   - src/components/sections/Routes/Routes.css
+   - src/components/sections/Rules/Rules.css
+   - src/components/sections/Faq/Faq.css
+   - src/components/sections/Contact/Contact.css
+   - src/components/ui/Toast.css
+   ========================================================================== */
+
+.app-wrapper {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
