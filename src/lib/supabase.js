@@ -1,11 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://nhvvvhpbspogqqwpbtrz.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5odnZ2aHBic3BvZ3Fxd3BidHJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2MDgzNTIsImV4cCI6MjEwODE4NDM1Mn0.x75NMmHhLepgnfhffNIi9RVPOi-BEUBmoCVAUUZBbPg';
 
-export const supabase = (supabaseUrl && supabaseAnonKey)
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : null;
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export const BUCKET_NAME = 'pistones-media';
 
