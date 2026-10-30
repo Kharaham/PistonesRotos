@@ -4,7 +4,7 @@ import { Menu, X, ChevronRight } from 'lucide-react';
 import { useCms } from '../../../context/CmsContext';
 
 export default function Navbar() {
-  const { cmsData } = useCms();
+  const { cmsData, isSectionVisible } = useCms();
   const { clubInfo } = cmsData;
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -40,29 +40,30 @@ export default function Navbar() {
 
         {/* Center: Navigation Links (Desktop) */}
         <ul className="nav-links">
-          <li>
-            <a href="#inicio" className="nav-link">Inicio</a>
-          </li>
-          <li>
-            <a href="#historia" className="nav-link">Historia</a>
-          </li>
-          <li>
-            <a href="#manifiesto" className="nav-link">Manifiesto</a>
-          </li>
-          <li>
-            <a href="#directiva" className="nav-link">Directiva</a>
-          </li>
-          <li>
-            <a href="#galeria" className="nav-link">Galería</a>
-          </li>
-          {cmsData.showRoutes !== false && (
-            <li>
-              <a href="#rodadas" className="nav-link">Rodadas</a>
-            </li>
+          {isSectionVisible('hero') && (
+            <li><a href="#inicio" className="nav-link">Inicio</a></li>
           )}
-          <li>
-            <a href="#memorial" className="nav-link">Memorial</a>
-          </li>
+          {isSectionVisible('history') && (
+            <li><a href="#historia" className="nav-link">Historia</a></li>
+          )}
+          {isSectionVisible('manifest') && (
+            <li><a href="#manifiesto" className="nav-link">Manifiesto</a></li>
+          )}
+          {isSectionVisible('committee') && (
+            <li><a href="#directiva" className="nav-link">Directiva</a></li>
+          )}
+          {isSectionVisible('gallery') && (
+            <li><a href="#galeria" className="nav-link">Galería</a></li>
+          )}
+          {isSectionVisible('routes') && (
+            <li><a href="#rodadas" className="nav-link">Rodadas</a></li>
+          )}
+          {isSectionVisible('memorial') && (
+            <li><a href="#memorial" className="nav-link">Memorial</a></li>
+          )}
+          {isSectionVisible('contact') && (
+            <li><a href="#contacto" className="nav-link">Contacto</a></li>
+          )}
         </ul>
 
         {/* Right: Actions (Subtle Status Badge & Burger on mobile) */}
@@ -86,37 +87,47 @@ export default function Navbar() {
       {/* Mobile Drawer */}
       <div className={`mobile-drawer ${mobileMenuOpen ? 'drawer-open' : ''}`}>
         <ul className="mobile-nav-list">
-          <li>
-            <a href="#inicio" className="mobile-nav-link" onClick={closeMenu}>
-              <span>Inicio</span>
-              <ChevronRight size={16} />
-            </a>
-          </li>
-          <li>
-            <a href="#historia" className="mobile-nav-link" onClick={closeMenu}>
-              <span>Historia</span>
-              <ChevronRight size={16} />
-            </a>
-          </li>
-          <li>
-            <a href="#manifiesto" className="mobile-nav-link" onClick={closeMenu}>
-              <span>Manifiesto</span>
-              <ChevronRight size={16} />
-            </a>
-          </li>
-          <li>
-            <a href="#directiva" className="mobile-nav-link" onClick={closeMenu}>
-              <span>Directiva</span>
-              <ChevronRight size={16} />
-            </a>
-          </li>
-          <li>
-            <a href="#galeria" className="mobile-nav-link" onClick={closeMenu}>
-              <span>Galería</span>
-              <ChevronRight size={16} />
-            </a>
-          </li>
-          {cmsData.showRoutes !== false && (
+          {isSectionVisible('hero') && (
+            <li>
+              <a href="#inicio" className="mobile-nav-link" onClick={closeMenu}>
+                <span>Inicio</span>
+                <ChevronRight size={16} />
+              </a>
+            </li>
+          )}
+          {isSectionVisible('history') && (
+            <li>
+              <a href="#historia" className="mobile-nav-link" onClick={closeMenu}>
+                <span>Historia</span>
+                <ChevronRight size={16} />
+              </a>
+            </li>
+          )}
+          {isSectionVisible('manifest') && (
+            <li>
+              <a href="#manifiesto" className="mobile-nav-link" onClick={closeMenu}>
+                <span>Manifiesto</span>
+                <ChevronRight size={16} />
+              </a>
+            </li>
+          )}
+          {isSectionVisible('committee') && (
+            <li>
+              <a href="#directiva" className="mobile-nav-link" onClick={closeMenu}>
+                <span>Directiva</span>
+                <ChevronRight size={16} />
+              </a>
+            </li>
+          )}
+          {isSectionVisible('gallery') && (
+            <li>
+              <a href="#galeria" className="mobile-nav-link" onClick={closeMenu}>
+                <span>Galería</span>
+                <ChevronRight size={16} />
+              </a>
+            </li>
+          )}
+          {isSectionVisible('routes') && (
             <li>
               <a href="#rodadas" className="mobile-nav-link" onClick={closeMenu}>
                 <span>Rodadas</span>
@@ -124,24 +135,38 @@ export default function Navbar() {
               </a>
             </li>
           )}
-          <li>
-            <a href="#reglas" className="mobile-nav-link" onClick={closeMenu}>
-              <span>Código</span>
-              <ChevronRight size={16} />
-            </a>
-          </li>
-          <li>
-            <a href="#memorial" className="mobile-nav-link" onClick={closeMenu}>
-              <span>Memorial</span>
-              <ChevronRight size={16} />
-            </a>
-          </li>
-          <li>
-            <a href="#faq" className="mobile-nav-link" onClick={closeMenu}>
-              <span>Preguntas</span>
-              <ChevronRight size={16} />
-            </a>
-          </li>
+          {isSectionVisible('rules') && (
+            <li>
+              <a href="#reglas" className="mobile-nav-link" onClick={closeMenu}>
+                <span>Código</span>
+                <ChevronRight size={16} />
+              </a>
+            </li>
+          )}
+          {isSectionVisible('memorial') && (
+            <li>
+              <a href="#memorial" className="mobile-nav-link" onClick={closeMenu}>
+                <span>Memorial</span>
+                <ChevronRight size={16} />
+              </a>
+            </li>
+          )}
+          {isSectionVisible('faqs') && (
+            <li>
+              <a href="#faq" className="mobile-nav-link" onClick={closeMenu}>
+                <span>Preguntas</span>
+                <ChevronRight size={16} />
+              </a>
+            </li>
+          )}
+          {isSectionVisible('contact') && (
+            <li>
+              <a href="#contacto" className="mobile-nav-link" onClick={closeMenu}>
+                <span>Contacto</span>
+                <ChevronRight size={16} />
+              </a>
+            </li>
+          )}
         </ul>
       </div>
     </nav>

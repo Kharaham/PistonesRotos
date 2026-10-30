@@ -22,7 +22,22 @@ const CmsContext = createContext();
 
 const STORAGE_KEY = 'pistones_cms_content_v2';
 
+export const DEFAULT_SECTION_VISIBILITY = {
+  hero: true,
+  history: true,
+  manifest: true,
+  committee: true,
+  convoy: true,
+  gallery: true,
+  routes: true,
+  rules: true,
+  memorial: true,
+  faqs: true,
+  contact: true
+};
+
 const DEFAULT_CMS_DATA = {
+  sectionVisibility: { ...DEFAULT_SECTION_VISIBILITY },
   clubInfo: {
     ...CLUB_INFO,
     logoImage: '/logo.jpg'
@@ -94,11 +109,19 @@ export function CmsProvider({ children }) {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
+        const savedVisibility = parsed.sectionVisibility || {};
+        if (parsed.showRoutes !== undefined && savedVisibility.routes === undefined) {
+          savedVisibility.routes = parsed.showRoutes !== false;
+        }
         // Ensure new sections exist in case of older saved states
         return {
           ...DEFAULT_CMS_DATA,
           ...parsed,
-          showRoutes: parsed.showRoutes !== undefined ? parsed.showRoutes : true,
+          sectionVisibility: {
+            ...DEFAULT_SECTION_VISIBILITY,
+            ...savedVisibility
+          },
+          showRoutes: savedVisibility.routes !== undefined ? savedVisibility.routes : (parsed.showRoutes !== undefined ? parsed.showRoutes : true),
           history: {
             ...DEFAULT_CMS_DATA.history,
             ...(parsed.history || {}),
@@ -182,10 +205,21 @@ export function CmsProvider({ children }) {
 
         if (remoteContent && remoteContent.hero && remoteContent.clubInfo) {
           // Si la nube ya tiene datos reales del club, adoptarlos como verdad absoluta
-          setCmsData((prev) => ({
-            ...prev,
-            ...remoteContent
-          }));
+          setCmsData((prev) => {
+            const remoteVis = remoteContent.sectionVisibility || {};
+            if (remoteContent.showRoutes !== undefined && remoteVis.routes === undefined) {
+              remoteVis.routes = remoteContent.showRoutes !== false;
+            }
+            return {
+              ...prev,
+              ...remoteContent,
+              sectionVisibility: {
+                ...DEFAULT_SECTION_VISIBILITY,
+                ...(prev.sectionVisibility || {}),
+                ...remoteVis
+              }
+            };
+          });
         } else {
           // Si la nube está vacía o sin inicializar, subir los datos locales actuales para sembrar la base de datos
           syncCmsToSupabase(cmsData);
@@ -211,10 +245,18 @@ export function CmsProvider({ children }) {
           { event: '*', schema: 'public', table: 'cms_content', filter: 'id=eq.1' },
           (payload) => {
             if (payload.new && payload.new.content && payload.new.content.hero) {
-              setCmsData((prev) => ({
-                ...prev,
-                ...payload.new.content
-              }));
+              setCmsData((prev) => {
+                const incomingVis = payload.new.content.sectionVisibility || {};
+                return {
+                  ...prev,
+                  ...payload.new.content,
+                  sectionVisibility: {
+                    ...DEFAULT_SECTION_VISIBILITY,
+                    ...(prev.sectionVisibility || {}),
+                    ...incomingVis
+                  }
+                };
+              });
             }
           }
         )
@@ -334,10 +376,65 @@ export function CmsProvider({ children }) {
     }));
   };
 
+  const isSectionVisible = (sectionKey) => {
+    if (sectionKey === 'routes' && cmsData.showRoutes === false && cmsData.sectionVisibility?.routes === undefined) {
+      return false;
+    }
+    if (cmsData.sectionVisibility && cmsData.sectionVisibility[sectionKey] !== undefined) {
+      return cmsData.sectionVisibility[sectionKey] !== false;
+    }
+    return true;
+  };
+
+  const toggleSectionVisibility = (sectionKey) => {
+    setCmsData((prev) => {
+      const currentVis = {
+        ...DEFAULT_SECTION_VISIBILITY,
+        ...(prev.sectionVisibility || {})
+      };
+      if (sectionKey === 'routes' && prev.showRoutes !== undefined && prev.sectionVisibility?.routes === undefined) {
+        currentVis.routes = prev.showRoutes !== false;
+      }
+      const nextState = !currentVis[sectionKey];
+      const updatedVis = {
+        ...currentVis,
+        [sectionKey]: nextState
+      };
+      return {
+        ...prev,
+        sectionVisibility: updatedVis,
+        ...(sectionKey === 'routes' ? { showRoutes: nextState } : {})
+      };
+    });
+  };
+
+  const setSectionVisibility = (sectionKey, isVisible) => {
+    setCmsData((prev) => {
+      const currentVis = {
+        ...DEFAULT_SECTION_VISIBILITY,
+        ...(prev.sectionVisibility || {})
+      };
+      const updatedVis = {
+        ...currentVis,
+        [sectionKey]: !!isVisible
+      };
+      return {
+        ...prev,
+        sectionVisibility: updatedVis,
+        ...(sectionKey === 'routes' ? { showRoutes: !!isVisible } : {})
+      };
+    });
+  };
+
   const updateShowRoutes = (enabled) => {
     setCmsData((prev) => ({
       ...prev,
-      showRoutes: enabled
+      showRoutes: enabled,
+      sectionVisibility: {
+        ...DEFAULT_SECTION_VISIBILITY,
+        ...(prev.sectionVisibility || {}),
+        routes: enabled
+      }
     }));
   };
 
@@ -475,7 +572,10 @@ export function CmsProvider({ children }) {
         syncStatus,
         syncWithCloud,
         loadFromCloud,
-        resetToDefaults
+        resetToDefaults,
+        isSectionVisible,
+        toggleSectionVisibility,
+        setSectionVisibility
       }}
     >
       {children}

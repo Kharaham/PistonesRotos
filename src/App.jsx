@@ -33,7 +33,7 @@ import { useScrollReveal } from './utils/useScrollReveal';
 
 function MainApp() {
   const { isAuthenticated } = useAuth();
-  const { cmsData } = useCms();
+  const { cmsData, isSectionVisible } = useCms();
   const [viewMode, setViewMode] = useState('landing'); // 'landing' | 'admin'
   const isLandingView = viewMode === 'landing' || !isAuthenticated;
 
@@ -127,39 +127,41 @@ function MainApp() {
       {/* Main landing content: Ordered Storytelling Flow */}
       <main id="main-content">
         {/* 1. Portada & Cifras en vivo */}
-        <Hero />
+        {isSectionVisible('hero') && <Hero />}
 
         {/* 2. Historia & Origen de Los Pistones Rotos */}
-        <History />
+        {isSectionVisible('history') && <History />}
 
         {/* 3. Manifiesto & 4 Pilares de Hermandad */}
-        <Manifest />
+        {isSectionVisible('manifest') && <Manifest />}
 
         {/* 4. Comité & Mesa Directiva de Presidentes */}
-        <Committee />
+        {isSectionVisible('committee') && <Committee />}
 
         {/* 5. La Manada & Disciplina en Caravana */}
-        <Convoy />
+        {isSectionVisible('convoy') && <Convoy />}
 
         {/* 6. Galería de Fotos & Bitácora en Ruta */}
-        <Gallery />
+        {isSectionVisible('gallery') && <Gallery />}
 
         {/* 7. Calendario de Rodadas Oficiales (Habilitable / Deshabilitable desde Admin) */}
-        {cmsData.showRoutes !== false && (
+        {isSectionVisible('routes') && (
           <Routes onSelectRoute={handleSelectRoute} />
         )}
 
         {/* 8. Código de Honor & Reglas del Asfalto */}
-        <Rules />
+        {isSectionVisible('rules') && <Rules />}
 
         {/* 9. Memorial Asfalto Eterno (Homenaje a Hermanos Fallecidos) */}
-        <Memorial onNotify={showToast} />
+        {isSectionVisible('memorial') && <Memorial onNotify={showToast} />}
 
         {/* 10. Preguntas Frecuentes */}
-        <Faq />
+        {isSectionVisible('faqs') && <Faq />}
 
         {/* 11. Convocatoria & Contacto */}
-        <Contact selectedRoute={selectedRoute} onNotify={showToast} />
+        {isSectionVisible('contact') && (
+          <Contact selectedRoute={selectedRoute} onNotify={showToast} />
+        )}
       </main>
 
       {/* Global footer */}

@@ -4,7 +4,7 @@ import { Lock } from 'lucide-react';
 import { useCms } from '../../../context/CmsContext';
 
 export default function Footer({ onOpenAdmin }) {
-  const { cmsData } = useCms();
+  const { cmsData, isSectionVisible } = useCms();
   const { clubInfo } = cmsData;
 
   return (
@@ -32,20 +32,21 @@ export default function Footer({ onOpenAdmin }) {
           <div>
             <h4 className="footer-col-title">Secciones</h4>
             <ul className="footer-links">
-              <li><a href="#inicio" className="footer-link">Inicio</a></li>
-              <li><a href="#manifiesto" className="footer-link">Manifiesto</a></li>
-              {cmsData.showRoutes !== false && (
+              {isSectionVisible('hero') && <li><a href="#inicio" className="footer-link">Inicio</a></li>}
+              {isSectionVisible('manifest') && <li><a href="#manifiesto" className="footer-link">Manifiesto</a></li>}
+              {isSectionVisible('routes') && (
                 <li><a href="#rodadas" className="footer-link">Calendario Rutas</a></li>
               )}
-              <li><a href="#reglas" className="footer-link">Código de Seguridad</a></li>
+              {isSectionVisible('rules') && <li><a href="#reglas" className="footer-link">Código de Seguridad</a></li>}
+              {isSectionVisible('memorial') && <li><a href="#memorial" className="footer-link">Memorial</a></li>}
             </ul>
           </div>
 
           <div>
             <h4 className="footer-col-title">Comunidad</h4>
             <ul className="footer-links">
-              <li><a href="#faq" className="footer-link">Preguntas Frecuentes</a></li>
-              <li><a href="#contacto" className="footer-link">Postulación Miembros</a></li>
+              {isSectionVisible('faqs') && <li><a href="#faq" className="footer-link">Preguntas Frecuentes</a></li>}
+              {isSectionVisible('contact') && <li><a href="#contacto" className="footer-link">Postulación Miembros</a></li>}
               <li><a href={clubInfo.whatsappLink || 'https://wa.me/56900000000'} target="_blank" rel="noopener noreferrer" className="footer-link">Grupo WhatsApp</a></li>
               <li><a href={clubInfo.instagramLink || 'https://instagram.com'} target="_blank" rel="noopener noreferrer" className="footer-link">Instagram</a></li>
             </ul>

@@ -9,6 +9,7 @@ import {
   Settings, 
   LogOut, 
   Eye, 
+  EyeOff,
   Menu, 
   Database,
   Users,
@@ -59,12 +60,69 @@ const TAB_TITLES = {
   database: 'Base de Datos'
 };
 
+const TAB_SECTION_KEYS = {
+  hero: 'hero',
+  historia: 'history',
+  manifest: 'manifest',
+  directiva: 'committee',
+  convoy: 'convoy',
+  galeria: 'gallery',
+  rutas: 'routes',
+  reglas: 'rules',
+  memorial: 'memorial',
+  solicitudes: 'contact',
+  faqs: 'faqs'
+};
+
+const NAV_GROUPS = [
+  {
+    group: 'IDENTIDAD & PORTADA',
+    items: [
+      { id: 'identidad', label: 'Identidad', icon: Settings },
+      { id: 'hero', label: 'Portada', icon: Clock, sectionKey: 'hero' },
+      { id: 'historia', label: 'Historia', icon: HistoryIcon, sectionKey: 'history' },
+    ]
+  },
+  {
+    group: 'HERMANDAD & PILARES',
+    items: [
+      { id: 'manifest', label: 'Manifiesto', icon: Shield, sectionKey: 'manifest' },
+      { id: 'directiva', label: 'Directiva', icon: Users, sectionKey: 'committee' },
+      { id: 'convoy', label: 'Caravana', icon: Compass, sectionKey: 'convoy' },
+      { id: 'galeria', label: 'Galería', icon: ImageIcon, sectionKey: 'gallery' },
+    ]
+  },
+  {
+    group: 'EN RUTA & MEMORIA',
+    items: [
+      { id: 'rutas', label: 'Rodadas', icon: MapPin, sectionKey: 'routes' },
+      { id: 'reglas', label: 'Reglas', icon: BookOpen, sectionKey: 'rules' },
+      { id: 'memorial', label: 'Memorial', icon: Flame, sectionKey: 'memorial' },
+      { id: 'solicitudes', label: 'Solicitudes', icon: Inbox, sectionKey: 'contact' },
+    ]
+  },
+  {
+    group: 'SISTEMA',
+    items: [
+      { id: 'faqs', label: 'Preguntas', icon: HelpCircle, sectionKey: 'faqs' },
+      { id: 'database', label: 'Base de Datos', icon: Database },
+    ]
+  }
+];
+
 export default function AdminDashboard({ onExitAdmin, onNotify }) {
   const { logout } = useAuth();
-  const { cmsData, syncStatus, syncWithCloud } = useCms();
+  const { 
+    cmsData, 
+    syncStatus, 
+    syncWithCloud, 
+    isSectionVisible, 
+    toggleSectionVisibility 
+  } = useCms();
 
   const [activeTab, setActiveTab] = useState('identidad');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const activeSectionKey = TAB_SECTION_KEYS[activeTab];
 
   const handleForceSync = async () => {
     if (onNotify) onNotify('Guardando cambios en Supabase...');
@@ -148,160 +206,62 @@ export default function AdminDashboard({ onExitAdmin, onNotify }) {
         </div>
 
         <nav className="admin-nav">
-          <span className="admin-nav-section-title">IDENTIDAD & PORTADA</span>
+          {NAV_GROUPS.map((group) => (
+            <React.Fragment key={group.group}>
+              <span className="admin-nav-section-title">{group.group}</span>
+              {group.items.map((item) => {
+                const IconComponent = item.icon;
+                const isToggleable = Boolean(item.sectionKey);
+                const isVisible = isToggleable ? isSectionVisible(item.sectionKey) : true;
+                const isActive = activeTab === item.id;
+                const isSolicitudes = item.id === 'solicitudes';
 
-          <button 
-            type="button"
-            className={`admin-nav-item ${activeTab === 'identidad' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('identidad'); setSidebarOpen(false); }}
-          >
-            <Settings size={18} />
-            <span>Identidad</span>
-          </button>
+                return (
+                  <button 
+                    key={item.id}
+                    type="button"
+                    className={`admin-nav-item ${isActive ? 'active' : ''} ${!isVisible ? 'is-section-hidden' : ''}`}
+                    onClick={() => { setActiveTab(item.id); setSidebarOpen(false); }}
+                  >
+                    <div className="admin-nav-item-main">
+                      <IconComponent size={18} />
+                      <span>{item.label}</span>
+                      {isSolicitudes && nuevasCount > 0 && (
+                        <span className="admin-badge-count">{nuevasCount}</span>
+                      )}
+                    </div>
 
-          <button 
-            type="button"
-            className={`admin-nav-item ${activeTab === 'hero' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('hero'); setSidebarOpen(false); }}
-          >
-            <Clock size={18} />
-            <span>Portada</span>
-          </button>
-
-          <button 
-            type="button"
-            className={`admin-nav-item ${activeTab === 'historia' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('historia'); setSidebarOpen(false); }}
-          >
-            <HistoryIcon size={18} />
-            <span>Historia</span>
-          </button>
-
-          <span className="admin-nav-section-title">HERMANDAD & PILARES</span>
-
-          <button 
-            type="button"
-            className={`admin-nav-item ${activeTab === 'manifest' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('manifest'); setSidebarOpen(false); }}
-          >
-            <Shield size={18} />
-            <span>Manifiesto</span>
-          </button>
-
-          <button 
-            type="button"
-            className={`admin-nav-item ${activeTab === 'directiva' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('directiva'); setSidebarOpen(false); }}
-          >
-            <Users size={18} />
-            <span>Directiva</span>
-          </button>
-
-          <button 
-            type="button"
-            className={`admin-nav-item ${activeTab === 'convoy' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('convoy'); setSidebarOpen(false); }}
-          >
-            <Compass size={18} />
-            <span>Caravana</span>
-          </button>
-
-          <button 
-            type="button"
-            className={`admin-nav-item ${activeTab === 'galeria' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('galeria'); setSidebarOpen(false); }}
-          >
-            <ImageIcon size={18} />
-            <span>Galería</span>
-          </button>
-
-          <span className="admin-nav-section-title">EN RUTA & MEMORIA</span>
-
-          <button 
-            type="button"
-            className={`admin-nav-item ${activeTab === 'rutas' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('rutas'); setSidebarOpen(false); }}
-          >
-            <MapPin size={18} />
-            <span>Rodadas</span>
-            {cmsData.showRoutes === false && (
-              <span style={{
-                marginLeft: 'auto',
-                fontSize: '0.68rem',
-                padding: '0.1rem 0.45rem',
-                borderRadius: '4px',
-                background: 'rgba(239, 68, 68, 0.15)',
-                color: '#f87171',
-                border: '1px solid rgba(239, 68, 68, 0.3)',
-                letterSpacing: '0.04em'
-              }}>
-                Oculta
-              </span>
-            )}
-          </button>
-
-          <button 
-            type="button"
-            className={`admin-nav-item ${activeTab === 'reglas' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('reglas'); setSidebarOpen(false); }}
-          >
-            <BookOpen size={18} />
-            <span>Reglas</span>
-          </button>
-
-          <button 
-            type="button"
-            className={`admin-nav-item ${activeTab === 'memorial' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('memorial'); setSidebarOpen(false); }}
-          >
-            <Flame size={18} />
-            <span>Memorial</span>
-          </button>
-
-          <button 
-            type="button"
-            className={`admin-nav-item ${activeTab === 'solicitudes' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('solicitudes'); setSidebarOpen(false); }}
-            style={{ position: 'relative' }}
-          >
-            <Inbox size={18} />
-            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-              Solicitudes
-              {nuevasCount > 0 && (
-                <span style={{
-                  fontSize: '0.7rem',
-                  fontWeight: 700,
-                  padding: '1px 6px',
-                  borderRadius: '10px',
-                  background: '#ef4444',
-                  color: '#fff',
-                  lineHeight: '1.2'
-                }}>
-                  {nuevasCount}
-                </span>
-              )}
-            </span>
-          </button>
-
-          <span className="admin-nav-section-title">SISTEMA</span>
-
-          <button 
-            type="button"
-            className={`admin-nav-item ${activeTab === 'faqs' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('faqs'); setSidebarOpen(false); }}
-          >
-            <HelpCircle size={18} />
-            <span>Preguntas</span>
-          </button>
-
-          <button 
-            type="button"
-            className={`admin-nav-item ${activeTab === 'database' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('database'); setSidebarOpen(false); }}
-          >
-            <Database size={18} />
-            <span>Base de Datos</span>
-          </button>
+                    {isToggleable && (
+                      <div 
+                        className={`admin-nav-vis-toggle ${isVisible ? 'vis-active' : 'vis-hidden'}`}
+                        title={isVisible ? `Sección visible en la landing. Clic para ocultar` : `Sección oculta en la landing. Clic para mostrar`}
+                        aria-label={isVisible ? `Ocultar sección ${item.label}` : `Mostrar sección ${item.label}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleSectionVisibility(item.sectionKey);
+                          if (onNotify) {
+                            onNotify(isVisible 
+                              ? `Sección "${item.label}" ocultada de la landing` 
+                              : `Sección "${item.label}" ahora visible en la landing`
+                            );
+                          }
+                        }}
+                      >
+                        {isVisible ? (
+                          <Eye size={15} />
+                        ) : (
+                          <>
+                            <EyeOff size={14} />
+                            <span className="admin-hidden-label">Oculta</span>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </React.Fragment>
+          ))}
         </nav>
 
         <div className="admin-sidebar-footer">
@@ -334,9 +294,40 @@ export default function AdminDashboard({ onExitAdmin, onNotify }) {
             </button>
             <div className="admin-topbar-title-group">
               <span className="admin-topbar-sub mono">PANEL CAPITÁN // CONFIGURACIÓN</span>
-              <h2 className="admin-section-name">
-                {TAB_TITLES[activeTab] || 'Panel'}
-              </h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
+                <h2 className="admin-section-name">
+                  {TAB_TITLES[activeTab] || 'Panel'}
+                </h2>
+                {activeSectionKey && (
+                  <button
+                    type="button"
+                    className={`admin-topbar-vis-pill ${isSectionVisible(activeSectionKey) ? 'is-visible' : 'is-hidden'}`}
+                    onClick={() => {
+                      const curVis = isSectionVisible(activeSectionKey);
+                      toggleSectionVisibility(activeSectionKey);
+                      if (onNotify) {
+                        onNotify(curVis 
+                          ? `Sección "${TAB_TITLES[activeTab]}" ocultada de la landing` 
+                          : `Sección "${TAB_TITLES[activeTab]}" visible en la landing`
+                        );
+                      }
+                    }}
+                    title="Alternar si esta sección se muestra en la landing pública"
+                  >
+                    {isSectionVisible(activeSectionKey) ? (
+                      <>
+                        <Eye size={13} />
+                        <span>Visible en Landing</span>
+                      </>
+                    ) : (
+                      <>
+                        <EyeOff size={13} />
+                        <span>Oculta en Landing</span>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
