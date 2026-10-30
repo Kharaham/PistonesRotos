@@ -1,0 +1,31 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    # Se ejecuta cada 3 días a las 12:00 UTC (así nunca se alcanzan los 7 días de inactividad)
+    - cron: '0 12 */3 * *'
+  workflow_dispatch: # Permite ejecutarlo manualmente desde la pestaña 'Actions' de GitHub
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase Database
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://nhvvvhpbspogqqwpbtrz.supabase.co' }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5odnZ2aHBic3BvZ3Fxd3BidHJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2MDgzNTIsImV4cCI6MjEwODE4NDM1Mn0.x75NMmHhLepgnfhffNIi9RVPOi-BEUBmoCVAUUZBbPg' }}
+        run: |
+          echo "Enviando ping a Supabase..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY" \
+            "$SUPABASE_URL/rest/v1/cms_content?select=id&limit=1")
+          
+          echo "Código de respuesta HTTP: $HTTP_STATUS"
+          
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+            echo "✅ Ping exitoso. Supabase permanece activo."
+          else
+            echo "⚠️ Advertencia: Supabase devolvió el código $HTTP_STATUS (verifica si el proyecto sigue pausado en supabase.com)"
+            exit 1
+          fi
